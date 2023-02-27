@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, Enum, ForeignKey, Text, String
+from sqlalchemy import Column, DECIMAL, Date, DateTime, ForeignKey, String, text
 from sqlalchemy.dialects.mysql import INTEGER
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,84 +7,101 @@ Base = declarative_base()
 metadata = Base.metadata
 
 
-class Category(Base):
-    __tablename__ = 'category'
+class Budget(Base):
+    __tablename__ = 'budget'
 
-    id = Column(INTEGER(11), primary_key=True, autoincrement=True)
-    name = Column(Text, nullable=False)
-    emoticon = Column(String(45), nullable=True)
-
+    id = Column(INTEGER(11), primary_key=True,autoincrement=True)
+    description = Column(String(200), nullable=False)
 
 
-class IncomeType(Base):
-    __tablename__ = 'income_type'
+class IncomeCategory(Base):
+    __tablename__ = 'income_category'
 
-    id = Column(INTEGER(11), primary_key=True, autoincrement=True)
-    name = Column(Text, nullable=False)
-
-
-class Limit(Base):
-    __tablename__ = 'limit'
-
-    id = Column(INTEGER(11), primary_key=True, autoincrement=True)
-    day_name = Column(Enum('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'), nullable=False)
-    limit_amount = Column(INTEGER(11), nullable=False)
+    id = Column(INTEGER(11), primary_key=True,autoincrement=True)
+    name = Column(String(200), nullable=False)
+    emoticon = Column(String(200))
 
 
-class BudgetPlan(Base):
-    __tablename__ = 'budget_plan'
+class OutcomeCategory(Base):
+    __tablename__ = 'outcome_category'
 
-    id = Column(INTEGER(11), primary_key=True, nullable=False, autoincrement=True)
-    category_id = Column(ForeignKey('category.id'), primary_key=True, nullable=False, index=True)
-    date_buy = Column(Date, nullable=False)
-    detail = Column(Text)
-    amount = Column(INTEGER(11), nullable=False)
+    id = Column(INTEGER(11), primary_key=True,autoincrement=True)
+    name = Column(String(200), nullable=False)
+    emoticon = Column(String(200))
 
-    category = relationship('Category')
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(INTEGER(11), primary_key=True,autoincrement=True)
+    discord_username = Column(String(200), nullable=False, unique=True)
+    pin = Column(String(45))
+    balance = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
+
+
+class BudgetList(Base):
+    __tablename__ = 'budget_list'
+
+    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
+    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
+    budget_id = Column(ForeignKey('budget.id'), primary_key=True, nullable=False, index=True)
+    amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_spend = Column(Date, nullable=False, server_default=text("curdate()"))
+
+    budget = relationship('Budget')
+    user = relationship('User')
 
 
 class Income(Base):
     __tablename__ = 'income'
 
-    id = Column(INTEGER(11), primary_key=True, nullable=False, autoincrement=True)
-    income_type_id = Column(ForeignKey('income_type.id'), primary_key=True, nullable=False, index=True)
-    date_created = Column(Date, nullable=False)
-    amount = Column(INTEGER(11), nullable=False)
-    detail = Column(Text)
+    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
+    income_category_id = Column(ForeignKey('income_category.id'), primary_key=True, nullable=False, index=True)
+    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
+    description = Column(String(250), nullable=False)
+    amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
 
-    income_type = relationship('IncomeType')
+    income_category = relationship('IncomeCategory')
+    user = relationship('User')
 
 
-class LimitPlan(Base):
-    __tablename__ = 'limit_plan'
+class MonthlySummary(Base):
+    __tablename__ = 'monthly_summary'
 
-    id = Column(INTEGER(11), primary_key=True, nullable=False, autoincrement=True)
-    limit_id = Column(ForeignKey('limit.id'), primary_key=True, nullable=False, index=True)
-    name = Column(Text, nullable=False)
+    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
+    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
+    month = Column(INTEGER(11), nullable=False)
+    total_income = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    total_outcome = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
 
-    limit = relationship('Limit')
+    user = relationship('User')
 
 
 class Outcome(Base):
     __tablename__ = 'outcome'
 
-    id = Column(INTEGER(11), primary_key=True, nullable=False, autoincrement=True)
-    category_id = Column(ForeignKey('category.id'), primary_key=True, nullable=False, index=True)
-    income_type_id = Column(ForeignKey('income_type.id'), primary_key=True, nullable=False, index=True)
-    detail_item = Column(Text)
-    amount = Column(INTEGER(11), nullable=False)
-    date_created = Column(Date, nullable=False)
+    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
+    outcome_category_id = Column(ForeignKey('outcome_category.id'), primary_key=True, nullable=False, index=True)
+    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
+    description = Column(String(250), nullable=False)
+    amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
 
-    category = relationship('Category')
-    income_type = relationship('IncomeType')
+    outcome_category = relationship('OutcomeCategory')
+    user = relationship('User')
 
 
-class SavingPlan(Base):
-    __tablename__ = 'saving_plan'
+class Saving(Base):
+    __tablename__ = 'saving'
 
-    id = Column(INTEGER(11), primary_key=True, nullable=False, autoincrement=True)
-    income_type_id = Column(ForeignKey('income_type.id'), primary_key=True, nullable=False, index=True)
-    date_saving = Column(Date, nullable=False)
-    amount = Column(INTEGER(11), nullable=False)
+    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
+    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
+    description = Column(String(200), nullable=False)
+    date_created = Column(DateTime, nullable=False)
+    amount = Column(DECIMAL(12, 2), nullable=False)
+    due_date = Column(Date, nullable=False)
 
-    income_type = relationship('IncomeType')
+    user = relationship('User')
