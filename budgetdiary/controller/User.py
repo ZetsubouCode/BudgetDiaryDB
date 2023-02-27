@@ -2,9 +2,9 @@ from typing import List
 from datetime import date
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
-from __database import get_session
-from model.database import User as UserModel
-from utils import Debug, DebugLevel
+from ..__database import get_session
+from ..model.database import User as UserModel
+from ..utils import Debug, DebugLevel
 
 class User:
     @staticmethod
