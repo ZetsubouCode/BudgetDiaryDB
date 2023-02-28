@@ -15,13 +15,6 @@ async def login(discord_username:str = Form(...), password:str = Form(...)):
             Debug.msg(debug_identifier, "Username or password is incorrect")
             return BaseResponse(**{"status": "Username or password is incorrect"})
 
-        if user.role.id:
-            privilege = await PrivilegeController.get_all_by_role_id(user.role.id)
-            list_privilege = [data.access_id for data in privilege ]
-
-        user.privilege = list_privilege
-
-
         return BaseResponse(**{"status": "Success", "content": user})
 
     except Exception as e:
@@ -107,12 +100,12 @@ async def update_by_id(id: int, discord_username:str = Form(...), pin: str = For
         return BaseResponse(**{"status": "Server error"})
 
 
-@subroute.put("/update/discord_username/{target_username}", response_model=BaseResponse)
-async def update_by_username(target_username: str, role_id:int = Form(...), branch_id:int = Form(...), discord_username:str = Form(...), password:str = Form(...), name:str = Form(...)
-                ,profile_picture: str = Form(...)):
+@subroute.put("/update/discord_username/{discord_username}", response_model=BaseResponse)
+async def update_by_username(discord_username: str, pin:str = Form(...),balance:float = Form(...)):
+
     debug_identifier = "UserRoute|update_by_name"
     try:
-        updated_user = await UserController.get_by_username(target_username)
+        updated_user = await UserController.get_by_username(discord_username)
         if not updated_user:
             Debug.msg(debug_identifier, "User does not exist")
             return BaseResponse(**{"status": "User does not exist"})
@@ -125,7 +118,7 @@ async def update_by_username(target_username: str, role_id:int = Form(...), bran
         updated_user.pin = pin
         updated_user.balance = balance
 
-        user = await UserController.update_by_username(target_username, updated_user)
+        user = await UserController.update_by_username(discord_username, updated_user, balance)
         if not user:
             Debug.msg(debug_identifier, "User not found")
             return BaseResponse(**{"status": "User not found"})
@@ -155,7 +148,7 @@ async def delete_by_id(id: int):
         return BaseResponse(**{"status": "Server error"})
 
 
-@subroute.delete("/delete/discord_username/{target_username}", response_model=BaseResponse)
+@subroute.delete("/delete/discord_username/{discord_username}", response_model=BaseResponse)
 async def delete_by_username(target_name: str):
     debug_identifier = "UserRoute|delete_by_username"
     try:
