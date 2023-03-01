@@ -55,6 +55,8 @@ class OutcomeCategory:
             sess.query(OutcomeCategoryModel).filter_by(id=int(target_id)).update(
                     {
                         OutcomeCategoryModel.name: new_obj.name,
+                        OutcomeCategoryModel.emoticon: new_obj.emoticon
+                        
                     }
                 )
             sess.commit()
