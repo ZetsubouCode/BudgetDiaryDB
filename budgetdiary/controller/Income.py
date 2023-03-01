@@ -2,10 +2,10 @@ from typing import List
 from datetime import date
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
-from __database import get_session
-from model.database import Income as IncomeModel
-from model.database import IncomeType as IncomeTypeModel
-from utils import Debug, DebugLevel
+from ..__database import get_session
+from ..model.database import Income as IncomeModel
+from ..model.database import IncomeCategory as IncomeCategoryModel
+from ..utils import Debug, DebugLevel
 
 class Income:
     @staticmethod
@@ -85,10 +85,10 @@ class Income:
         with get_session() as session:
             income = session.query(
                 func.sum(IncomeModel.amount).label("amount"),
-                IncomeTypeModel.name.label("name")).join(
-                    IncomeTypeModel).group_by(
-                            IncomeTypeModel.name
-            ).order_by(IncomeTypeModel.name).all()
+                IncomeCategoryModel.name.label("name")).join(
+                    IncomeCategoryModel).group_by(
+                            IncomeCategoryModel.name
+            ).order_by(IncomeCategoryModel.name).all()
         return income
 
     @staticmethod
