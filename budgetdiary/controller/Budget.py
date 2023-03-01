@@ -1,53 +1,23 @@
 from typing import List
-from sqlalchemy.sql import func
-from datetime import date
-from sqlalchemy.orm import joinedload
-from ..__database import get_session
-from ..model.database import Budget as BudgetModel
-from ..utils import Debug, DebugLevel
+from __database import get_session
+from model.database import Budget as BudgetModel
+from utils import Debug, DebugLevel
 
 class Budget:
-
     @staticmethod
-    async def get_budget_total() -> BudgetModel:
+    async def get_by_id(target_id: int) -> BudgetModel:
         """
         Get the first result of Budget by its id
         @param target_id: The id of the Budget data
         @return: Budget object
         """
         with get_session() as session:
-            budget = session.query(func.sum(BudgetModel.amount).label("amount")).all()
+            budget = session.query(BudgetModel).filter_by(id=target_id).first()
 
         return budget
     
     @staticmethod
-    async def get_monthly_budget(first_date: date, last_date: date) -> BudgetModel:
-        """
-        Get the first result of Budget by its id
-        @param target_id: The id of the Budget data
-        @return: Budget object
-        """
-        with get_session() as session:
-            budget = session.query(BudgetModel).options(joinedload(BudgetModel.category)
-            ).filter(BudgetModel.date_buy>=first_date,BudgetModel.date_buy<=last_date).all()
-
-        return budget
-
-    @staticmethod
-    async def get_monthly_total(first_date: date, last_date: date) -> BudgetModel:
-        """
-        Get the first result of Budget by its id
-        @param target_id: The id of the Budget data
-        @return: Budget object
-        """
-        with get_session() as session:
-            budget = session.query(func.sum(BudgetModel.amount).label("amount")).filter(
-                BudgetModel.date_buy>=first_date,BudgetModel.date_buy<=last_date).all()
-
-        return budget
-    
-    @staticmethod
-    async def get_all() -> List[BudgetModel]:
+    def get_all() -> List[BudgetModel]:
         """
         Get all result of Budget data
         @return: List of Budget object
@@ -57,7 +27,7 @@ class Budget:
         return budget
 
     @staticmethod
-    async def add(category_id: int, date_buy: date, detail:str, amount:int) -> BudgetModel:
+    async def add(description:str)-> BudgetModel:
         """
         Create Budget object and add it to the database
         @param last_layer: Budget last_layer
@@ -65,7 +35,7 @@ class Budget:
         @return: Budget object
         """
         with get_session() as session:
-            budget = BudgetModel(category_id=category_id, date_buy=date_buy, detail=detail, amount=amount)
+            budget = BudgetModel(description=description)
             session.add(budget)
             session.commit()
             session.flush()
@@ -84,9 +54,8 @@ class Budget:
         with get_session() as sess:
             sess.query(BudgetModel).filter_by(id=int(target_id)).update(
                     {
-                        BudgetModel.category_id : new_obj.category_id,
-                        BudgetModel.detail : new_obj.detail,
-                        BudgetModel.amount : new_obj.amount,
+                        BudgetModel.description: new_obj.description,
+                        
                     }
                 )
             sess.commit()
