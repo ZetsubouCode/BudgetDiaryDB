@@ -55,6 +55,8 @@ class IncomeCategory:
             sess.query(IncomeCategoryModel).filter_by(id=int(target_id)).update(
                     {
                         IncomeCategoryModel.name: new_obj.name,
+                        IncomeCategoryModel.emoticon: new_obj.emoticon
+                        
                     }
                 )
             sess.commit()
