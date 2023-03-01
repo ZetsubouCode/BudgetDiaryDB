@@ -2,10 +2,10 @@ from typing import List
 from sqlalchemy.sql import func
 from datetime import date
 from sqlalchemy.orm import joinedload
-from __database import get_session
-from model.database import Outcome as OutcomeModel
-from model.database import IncomeType as IncomeTypeModel
-from utils import Debug, DebugLevel
+from ..__database import get_session
+from ..model.database import Outcome as OutcomeModel
+from ..model.database import OutcomeCategory as OutcomeCategoryModel
+from ..utils import Debug, DebugLevel
 
 class Outcome:
     @staticmethod
@@ -47,15 +47,15 @@ class Outcome:
 
     
     @staticmethod
-    async def get_specific_latest_outcome(keyword:str,category_id:int) -> OutcomeModel:
+    async def get_specific_latest_outcome(keyword:str,outcome_category:int) -> OutcomeModel:
         """
-        Get the first result of Outcome by its category id and depend on the keyword
+        Get the first result of Outcome by its outcome_category id and depend on the keyword
         @param target_id: The id of the Outcome data
         @return: Outcome object
         """
         with get_session() as session:
-            outcome = session.query(OutcomeModel).options(joinedload(OutcomeModel.category), joinedload(OutcomeModel.income_type)
-            ).filter(OutcomeModel.category_id==category_id,func.lower(OutcomeModel.detail_item.like(keyword))
+            outcome = session.query(OutcomeModel).options(joinedload(OutcomeModel.outcome_category), joinedload(OutcomeModel.outcome_category)
+            ).filter(OutcomeModel.outcome_category==outcome_category,func.lower(OutcomeModel.description.like(keyword))
                 ).order_by(OutcomeModel.date_created.desc()).first()
 
         return outcome
@@ -68,7 +68,7 @@ class Outcome:
         @return: Outcome object
         """
         with get_session() as session:
-            outcome = session.query(OutcomeModel).options(joinedload(OutcomeModel.category), joinedload(OutcomeModel.income_type)
+            outcome = session.query(OutcomeModel).options(joinedload(OutcomeModel.outcome_category), joinedload(OutcomeModel.outcome_category)
             ).filter_by(date_created=target_date).all()
 
         return outcome
@@ -81,7 +81,7 @@ class Outcome:
         @return: Outcome object
         """
         with get_session() as session:
-            outcome = session.query(OutcomeModel).options(joinedload(OutcomeModel.category), joinedload(OutcomeModel.income_type)
+            outcome = session.query(OutcomeModel).options(joinedload(OutcomeModel.outcome_category), joinedload(OutcomeModel.outcome_category)
             ).filter(OutcomeModel.date_created>=first_date,OutcomeModel.date_created<=last_date).order_by(OutcomeModel.date_created).all()
 
         return outcome
@@ -95,10 +95,10 @@ class Outcome:
         with get_session() as session:
             income = session.query(
                 func.sum(OutcomeModel.amount).label("amount"),
-                IncomeTypeModel.name.label("name")).join(
-                    IncomeTypeModel).group_by(
-                            IncomeTypeModel.name
-            ).order_by(IncomeTypeModel.name).all()
+                OutcomeCategoryModel.name.label("name")).join(
+                    OutcomeCategoryModel).group_by(
+                            OutcomeCategoryModel.name
+            ).order_by(OutcomeCategoryModel.name).all()
         return income
 
     @staticmethod
@@ -125,7 +125,7 @@ class Outcome:
         return outcome
 
     @staticmethod
-    async def add(category_id: int, income_type_id:int, detail_item:str, amount:int, date_created:date) -> OutcomeModel:
+    async def add( outcome_category_id:int,description:str, amount:int) -> OutcomeModel:
         """
         Create Outcome object and add it to the database
         @param last_layer: Outcome last_layer
@@ -133,7 +133,7 @@ class Outcome:
         @return: Outcome object
         """
         with get_session() as session:
-            outcome = OutcomeModel(category_id=category_id, income_type_id=income_type_id,date_created=date_created, detail_item=detail_item, amount=amount)
+            outcome = OutcomeModel(outcome_category_id=outcome_category_id,description=description, amount=amount)
             session.add(outcome)
             session.commit()
             session.flush()
@@ -152,8 +152,9 @@ class Outcome:
         with get_session() as sess:
             sess.query(OutcomeModel).filter_by(id=int(target_id)).update(
                     {
-                        OutcomeModel.category_id: new_obj.category_id,
-                        OutcomeModel.income_type_id: new_obj.income_type_id,
+                        OutcomeModel.outcome_category_id: new_obj.outcome_category_id,
+                        OutcomeModel.description : new_obj.description,
+                        OutcomeModel.amount: new_obj.amount
                         
                     }
                 )
