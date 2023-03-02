@@ -21,7 +21,7 @@ class Income:
         return income
 
     @staticmethod
-    async def get_by_income_type_and_date(income_type_id: int,
+    async def get_by_income_category_and_date(income_category_id: int,
                                           first_date: date,
                                           last_date: date) -> IncomeModel:
         """
@@ -31,7 +31,7 @@ class Income:
         """
         with get_session() as session:
             income = session.query(IncomeModel).filter(
-                IncomeModel.income_type_id == income_type_id,
+                IncomeModel.income_category_id == income_category_id,
                 IncomeModel.date_created >= first_date,
                 IncomeModel.date_created <= last_date).all()
 
@@ -45,7 +45,7 @@ class Income:
         """
         with get_session() as session:
             income = session.query(IncomeModel).options(
-                joinedload(IncomeModel.income_type)).all()
+                joinedload(IncomeModel.income_category)).all()
         return income
         
     @staticmethod
@@ -56,7 +56,7 @@ class Income:
         """
         with get_session() as session:
             income = session.query(IncomeModel).options(
-                joinedload(IncomeModel.income_type)
+                joinedload(IncomeModel.income_category)
                 ).filter(IncomeModel.date_created == date).all()
         return income
 
@@ -69,7 +69,7 @@ class Income:
         """
         with get_session() as session:
             income = session.query(IncomeModel).options(
-                joinedload(IncomeModel.income_type)).filter(
+                joinedload(IncomeModel.income_category)).filter(
                     IncomeModel.date_created >= first_date,
                     IncomeModel.date_created <= last_date,
                     IncomeModel.amount > 0).order_by(
@@ -118,7 +118,7 @@ class Income:
         return income
 
     @staticmethod
-    async def add(amount: int, date_created: date, income_type_id: int,
+    async def add(amount: int, date_created: date, income_category_id: int,
                   detail: str) -> IncomeModel:
         """
         Create Income object and add it to the database
@@ -129,7 +129,7 @@ class Income:
         with get_session() as session:
             income = IncomeModel(amount=amount,
                                  date_created=date_created,
-                                 income_type_id=income_type_id,
+                                 income_category_id=income_category_id,
                                  detail=detail)
             session.add(income)
             session.commit()
@@ -149,8 +149,8 @@ class Income:
         """
         with get_session() as sess:
             sess.query(IncomeModel).filter_by(id=int(target_id)).update({
-                IncomeModel.income_type_id:
-                new_obj.income_type_id,
+                IncomeModel.income_category_id:
+                new_obj.income_category_id,
                 IncomeModel.date_created:
                 new_obj.date_created,
                 IncomeModel.amount:
