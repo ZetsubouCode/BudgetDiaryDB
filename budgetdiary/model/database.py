@@ -6,14 +6,6 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 metadata = Base.metadata
 
-
-class Budget(Base):
-    __tablename__ = 'budget'
-
-    id = Column(INTEGER(11), primary_key=True,autoincrement=True)
-    description = Column(String(200), nullable=False)
-
-
 class IncomeCategory(Base):
     __tablename__ = 'income_category'
 
@@ -38,20 +30,6 @@ class User(Base):
     pin = Column(String(45))
     balance = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
     date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
-
-
-class BudgetList(Base):
-    __tablename__ = 'budget_list'
-
-    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
-    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
-    budget_id = Column(ForeignKey('budget.id'), primary_key=True, nullable=False, index=True)
-    amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
-    date_spend = Column(Date, nullable=False, server_default=text("curdate()"))
-
-    budget = relationship('Budget')
-    user = relationship('User')
-
 
 class Income(Base):
     __tablename__ = 'income'
