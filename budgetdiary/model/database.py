@@ -66,6 +66,7 @@ class Outcome(Base):
     user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
     description = Column(String(250), nullable=False)
     amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_spend = Column(Date, nullable=True)
     date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
 
     outcome_category = relationship('OutcomeCategory')

@@ -125,7 +125,7 @@ class Outcome:
         return outcome
 
     @staticmethod
-    async def add( outcome_category_id:int,description:str, amount:int) -> OutcomeModel:
+    async def add(user_id:str, outcome_category_id:int,description:str, amount:int, date_spend:date) -> OutcomeModel:
         """
         Create Outcome object and add it to the database
         @param last_layer: Outcome last_layer
@@ -133,7 +133,7 @@ class Outcome:
         @return: Outcome object
         """
         with get_session() as session:
-            outcome = OutcomeModel(outcome_category_id=outcome_category_id,description=description, amount=amount)
+            outcome = OutcomeModel(user_id=user_id,outcome_category_id=outcome_category_id,description=description, amount=amount,date_spend=date_spend)
             session.add(outcome)
             session.commit()
             session.flush()
@@ -154,7 +154,8 @@ class Outcome:
                     {
                         OutcomeModel.outcome_category_id: new_obj.outcome_category_id,
                         OutcomeModel.description : new_obj.description,
-                        OutcomeModel.amount: new_obj.amount
+                        OutcomeModel.amount: new_obj.amount,
+                        OutcomeModel.date_spend: new_obj.date_spend
                         
                     }
                 )
@@ -177,7 +178,7 @@ class Outcome:
                     
                 except Exception as e:
                     sess.rollback()
-                    Debug.msg("OutcomeController|delete_by_id", "Failed to Delete {}".format(e), DebugLevel.WARNING)
+                    Debug.msg("OutcomeController|delete_by_id", "Failed to Delete {}".format(e), DebugLevel.ERROR)
                     
         except Exception as e:
             Debug.msg("OutcomeController|delete_by_id", "Exception Raised {}".format(e), DebugLevel.ERROR)
