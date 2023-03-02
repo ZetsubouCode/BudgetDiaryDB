@@ -16,13 +16,6 @@ app.include_router(
     tags=['Saving']
 )
 
-from .route.Budget import subroute as budget_route
-app.include_router(
-    budget_route,
-    prefix='/budget',
-    tags=['Budget']
-)
-
 from .route.Income import subroute as income_route
 app.include_router(
     income_route,
