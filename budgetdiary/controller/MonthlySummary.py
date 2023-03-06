@@ -1,5 +1,4 @@
 from typing import List
-from datetime import date
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
 from ..__database import get_session
@@ -45,11 +44,12 @@ class MonthlySummary:
         return monthly_summary
 
     @staticmethod
-    async def add(description: str, amount: float, due_date: date) -> MonthlySummaryModel:
+    async def add(month: int, total_income: float, total_outcome: float) -> MonthlySummaryModel:
         """
         Create MonthlySummary object and add it to the database
-        @param last_layer: MonthlySummary last_layer
-        @param last_room: MonthlySummary last_room
+        @param month: MonthlySummary last_layer
+        @param total_income: MonthlySummary total income
+        @param total_outcome: MonthlySummary total outcome
         @return: MonthlySummary object
         """
         with get_session() as session:
@@ -74,9 +74,9 @@ class MonthlySummary:
         """
         with get_session() as sess:
             sess.query(MonthlySummaryModel).filter_by(id=int(target_id)).update({
-                MonthlySummaryModel.description:new_obj.description,
-                MonthlySummaryModel.amount:new_obj.amount,
-                MonthlySummaryModel.due_date:new_obj.due_date
+                MonthlySummaryModel.month:new_obj.month,
+                MonthlySummaryModel.total_income:new_obj.total_income,
+                MonthlySummaryModel.total_outcome:new_obj.total_outcome,
             })
             sess.commit()
         return new_obj
@@ -100,7 +100,7 @@ class MonthlySummary:
                     sess.rollback()
                     Debug.msg("MonthlySummaryController|delete_by_id",
                               "Failed to Delete {}".format(e),
-                              DebugLevel.WARNING)
+                              DebugLevel.ERROR)
 
         except Exception as e:
             Debug.msg("MonthlySummaryController|delete_by_id",
