@@ -80,30 +80,41 @@ class User:
             sess.commit()
         return new_obj
 
-    @staticmethod
-    async def delete_by_id(target_id: int):
-        """
-        Delete User object that have the specific id
-        @param taget_id: User id
-        """
-        try:
-            with get_session() as sess:
+@staticmethod
+async def delete_by_id(target_id: int):
+    """
+    Delete User object that have the specific id
+    @param taget_id: User id
+    """
+    try:
+        with get_session() as sess:
+            try:
+                sess.query(UserModel).filter_by(
+                    id=int(target_id)).delete()
+                sess.flush()
 
-                try:
-                    sess.query(UserModel).filter_by(
-                        id=int(target_id)).delete()
-                    sess.commit()
-                    sess.flush()
+            except Exception as e:
+                sess.rollback()
+                Debug.msg("UserController|delete_by_id",
+                          "Failed to Delete {}".format(e),
+                          DebugLevel.WARNING)
+                return False
 
-                except Exception as e:
-                    sess.rollback()
-                    Debug.msg("UserController|delete_by_id",
-                              "Failed to Delete {}".format(e),
-                              DebugLevel.WARNING)
+            try:
+                sess.commit()
+            except Exception as e:
+                sess.rollback()
+                Debug.msg("UserController|delete_by_id",
+                          "Failed to commit transaction: {}".format(e),
+                          DebugLevel.ERROR)
+                return False
+                
+        return True
 
-        except Exception as e:
-            Debug.msg("UserController|delete_by_id",
-                      "Exception Raised {}".format(e), DebugLevel.ERROR)
+    except Exception as e:
+        Debug.msg("UserController|delete_by_id",
+                  "Exception Raised {}".format(e), DebugLevel.ERROR)
+        return False
             
     @staticmethod
     async def encrypt_pin(pin:str) -> str:
