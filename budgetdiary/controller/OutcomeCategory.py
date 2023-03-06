@@ -30,8 +30,8 @@ class OutcomeCategory:
     async def add(name:str,emoticon:str)-> OutcomeCategoryModel:
         """
         Create OutcomeCategory object and add it to the database
-        @param last_layer: OutcomeCategory last_layer
-        @param last_room: OutcomeCategory last_room
+        @param name: The name of the OutcomeCategory
+        @param emoticon: The emoticon of the OutcomeCategory
         @return: OutcomeCategory object
         """
         with get_session() as session:
