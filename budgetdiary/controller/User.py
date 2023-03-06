@@ -1,3 +1,5 @@
+import os
+import hashlib
 from typing import List
 from datetime import date
 from sqlalchemy.sql import func
@@ -20,14 +22,25 @@ class User:
         return user
 
     @staticmethod
+    async def get_by_username(target_username: str) -> UserModel:
+        """
+        Get the first result of User by its username
+        @param target_id: The id of the User data
+        @return: User object
+        """
+        with get_session() as session:
+            user = session.query(UserModel).filter_by(discord_username=target_username).first()
+
+        return user
+
+    @staticmethod
     async def get_all() -> List[UserModel]:
         """
         Get all result of User data
         @return: List of User object
         """
         with get_session() as session:
-            user = session.query(UserModel).options(
-                joinedload(UserModel.user_type)).all()
+            user = session.query(UserModel).all()
         return user
 
     @staticmethod
@@ -91,3 +104,25 @@ class User:
         except Exception as e:
             Debug.msg("UserController|delete_by_id",
                       "Exception Raised {}".format(e), DebugLevel.ERROR)
+            
+    @staticmethod
+    async def encrypt_pin(pin:str) -> str:
+        encoded = (pin+os.environ.get("SALT")).encode()
+        result = hashlib.sha256(encoded)
+        
+        return result.hexdigest()
+
+    @staticmethod
+    async def authenticate(username:str, pin:str) -> bool :
+        log_identifier = "UserController|check_pin"
+
+        result = await User.encrypt_pin(pin)
+        data = await User.get_by_username(username)
+        if not data:
+            Debug.msg(log_identifier, "Data not found", DebugLevel.INFO)
+            return None
+        if result!=data.pin:
+            Debug.msg(log_identifier, "Wrong PIN", DebugLevel.INFO)
+            return None
+
+        return data
