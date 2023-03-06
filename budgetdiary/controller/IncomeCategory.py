@@ -30,8 +30,8 @@ class IncomeCategory:
     async def add(name:str,emoticon:str)-> IncomeCategoryModel:
         """
         Create IncomeCategory object and add it to the database
-        @param last_layer: IncomeCategory last_layer
-        @param last_room: IncomeCategory last_room
+        @param name: The name of the IncomeCategory
+        @param emoticon: The emoticon of the IncomeCategory
         @return: IncomeCategory object
         """
         with get_session() as session:
