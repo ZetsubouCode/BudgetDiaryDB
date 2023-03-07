@@ -125,7 +125,7 @@ class OutcomePlan:
         return outcome_plan
 
     @staticmethod
-    async def add(user_id:str, outcome_plan_category_id:int,description:str, amount:int, date_spend:date) -> OutcomePlanModel:
+    async def add(user_id:str, outcome_plan_category_id:int,description:str, amount:int, quantity:int, date_spend:date) -> OutcomePlanModel:
         """
         Create OutcomePlan object and add it to the database
         @param last_layer: OutcomePlan last_layer
@@ -133,7 +133,7 @@ class OutcomePlan:
         @return: OutcomePlan object
         """
         with get_session() as session:
-            outcome_plan = OutcomePlanModel(user_id=user_id,outcome_plan_category_id=outcome_plan_category_id,description=description, amount=amount,date_spend=date_spend)
+            outcome_plan = OutcomePlanModel(user_id=user_id,outcome_plan_category_id=outcome_plan_category_id,description=description, amount=amount,quantity=quantity,date_spend=date_spend)
             session.add(outcome_plan)
             session.commit()
             session.flush()
@@ -155,6 +155,7 @@ class OutcomePlan:
                         OutcomePlanModel.outcome_plan_category_id: new_obj.outcome_plan_category_id,
                         OutcomePlanModel.description : new_obj.description,
                         OutcomePlanModel.amount: new_obj.amount,
+                        OutcomePlanModel.quantity: new_obj.quantity,
                         OutcomePlanModel.date_spend: new_obj.date_spend
                         
                     }
