@@ -33,3 +33,9 @@ script:"../[path to cloned repo]/[your script name]"
 ```
 
 6. Run project
+- Enter your node.js virtual env
+- run this command
+```
+npx pm2 start ~/[path to cloned repo]/ecosystem.config.js
+### Example -> npx pm2 start ~/public_html/backend-pjtki/ecosystem.config.js
+```
