@@ -73,7 +73,7 @@ class Outcome(Base):
     user = relationship('User')
     
 class OutcomePlan(Base):
-    __tablename__ = 'outcome'
+    __tablename__ = 'outcome_plan'
 
     id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
     outcome_category_id = Column(ForeignKey('outcome_category.id'), primary_key=True, nullable=False, index=True)
