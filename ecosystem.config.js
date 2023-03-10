@@ -2,7 +2,7 @@ module.exports = {
     apps: [
       {
         name: "budget-diary",
-        script:"../public_html/budget_diary/run.sh",
+        script:"../public_html/BudgetDiaryDB/run.sh",
         watch: 'budgetdiary/',
         ignore_watch: [
           "build",
