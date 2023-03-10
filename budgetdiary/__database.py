@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 engine = create_engine(
     "mysql+pymysql://{}:{}@{}/{}".format(
 		os.environ.get("DB_USER"),
-		urlquote(os.environ.get("DB_PASS")),
+		urlquote(str(os.environ.get("DB_PASS"))),
 		os.environ.get("DB_HOST"),
 		os.environ.get("DB_NAME")
     ),
