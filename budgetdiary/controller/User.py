@@ -30,7 +30,7 @@ class User:
         return data
     
     @staticmethod
-    async def get_by_username(target_username: str) -> UserModel:
+    async def get_all() -> UserModel:
         """
         Get the User object by its username
         @param target_id: The id of the User data
