@@ -27,7 +27,7 @@ class User(Base):
 
     id = Column(INTEGER(11), primary_key=True,autoincrement=True)
     discord_username = Column(String(200), nullable=False, unique=True)
-    pin = Column(String(45))
+    pin = Column(String(256))
     balance = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
     date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
 
