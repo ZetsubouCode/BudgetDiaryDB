@@ -184,13 +184,13 @@ async def delete_by_id(id: int):
 async def delete_by_username(target_username: str):
     debug_identifier = "UserRoute|delete_by_username"
     try:
-        user = await UserController.get_by_discord_username(target_name)
+        user = await UserController.get_by_discord_username(target_username)
         if not user:
             message = "User does not exist"
             Debug.msg(debug_identifier, message)
             return BaseResponse(**{"status": message})
 
-        deleted = await UserController.delete_by_discord_username(target_name)
+        deleted = await UserController.delete_by_discord_username(target_username)
         if not deleted:
             message = "Failed to delete user"
             Debug.msg(debug_identifier, message)
