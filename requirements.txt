@@ -8,3 +8,4 @@ sqlalchemy >= 1.4.32
 python-multipart >= 0.0.5
 sqlacodegen
 pymysql
+a2wsgi

@@ -66,7 +66,21 @@ class Outcome(Base):
     user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
     description = Column(String(250), nullable=False)
     amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
-    date_spend = Column(Date, nullable=True)
+    date_spend = Column(Date, nullable=False)
+    date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
+
+    outcome_category = relationship('OutcomeCategory')
+    user = relationship('User')
+    
+class OutcomePlan(Base):
+    __tablename__ = 'outcome_plan'
+
+    id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
+    outcome_category_id = Column(ForeignKey('outcome_category.id'), primary_key=True, nullable=False, index=True)
+    user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
+    description = Column(String(250), nullable=False)
+    amount = Column(DECIMAL(12, 2), nullable=False, server_default=text("0.00"))
+    date_spend = Column(Date, nullable=False)
     date_created = Column(DateTime, nullable=False, server_default=text("current_timestamp()"))
 
     outcome_category = relationship('OutcomeCategory')
@@ -79,7 +93,7 @@ class Saving(Base):
     id = Column(INTEGER(11), primary_key=True, nullable=False,autoincrement=True)
     user_id = Column(ForeignKey('user.id'), primary_key=True, nullable=False, index=True)
     description = Column(String(200), nullable=False)
-    date_created = Column(DateTime, nullable=False)
+    date_created = Column(DateTime, nullable=False,server_default=text("current_timestamp()"))
     amount = Column(DECIMAL(12, 2), nullable=False)
     due_date = Column(Date, nullable=False)
 

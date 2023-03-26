@@ -8,13 +8,13 @@ from ..utils import Debug
 subroute = APIRouter()
 
 @subroute.post("/login", response_model=BaseResponse)
-async def login(discord_username:str = Form(...), password:str = Form(...)):
+async def login(discord_username:str = Form(...), pin:str = Form(...)):
     debug_identifier = "User|login"
     try:
-        user = await UserController.authenticate(discord_username, password)
+        user = await UserController.authenticate(discord_username, pin)
         if not user:
-            Debug.msg(debug_identifier, "Username or password is incorrect")
-            return BaseResponse(**{"status": "Username or password is incorrect"})
+            Debug.msg(debug_identifier, "Username or pin is incorrect")
+            return BaseResponse(**{"status": "Username or pin is incorrect"})
 
         return BaseResponse(**{"status": "Success", "content": user})
 
@@ -59,7 +59,7 @@ async def get_all():
 
 
 @subroute.post("/add", response_model=BaseResponse)
-async def add(discord_username:str = Form(...), pin:str = Form(...)):
+async def add(discord_username:str = Form(...), pin:Optional[str] = Form(None)):
     debug_identifier = "UserRoute|add"
     try:
         if await UserController.get_by_discord_username(discord_username):
@@ -181,7 +181,7 @@ async def delete_by_id(id: int):
 
 
 @subroute.delete("/delete/discord_username/{discord_username}", response_model=BaseResponse)
-async def delete_by_username(target_name: str):
+async def delete_by_username(target_username: str):
     debug_identifier = "UserRoute|delete_by_username"
     try:
         user = await UserController.get_by_discord_username(target_name)

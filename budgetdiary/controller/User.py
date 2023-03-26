@@ -9,7 +9,7 @@ class User:
     @staticmethod
     async def get_by_id(target_id: int) -> UserModel:
         """
-        Get the first result of User by its id
+        Get the User object by its id
         @param target_id: The id of the User data
         @return: User object
         """
@@ -30,10 +30,11 @@ class User:
         return data
     
     @staticmethod
-    async def get_all() -> List[UserModel]:
+    async def get_by_username(target_username: str) -> UserModel:
         """
-        Get all result of User data
-        @return: List of User object
+        Get the User object by its username
+        @param target_id: The id of the User data
+        @return: User object
         """
         with get_session() as session:
             user = session.query(UserModel).all()
@@ -42,9 +43,10 @@ class User:
     @staticmethod
     async def add(discord_username: str, pin: str) -> UserModel:
         """
-        Create User object and add it to the database
-        @param last_layer: User last_layer
-        @param last_room: User last_room
+        Add a new User object to the database
+        @param discord_username: Discord username of the user
+        @param pin: PIN of the user
+        @param balance: balance of the user
         @return: User object
         """
         with get_session() as session:
@@ -61,10 +63,10 @@ class User:
     async def update_by_id(target_id: int,
                            new_obj: UserModel) -> UserModel:
         """
-        Update User object that have the specific id
-        @param taget_id: User id
-        @param new_obj: User User new set of data
-        @return: User object
+        Update the User object by its id
+        @param target_id: Id of the User object to update
+        @param new_obj: New User object data
+        @return: Updated User object
         """
         with get_session() as sess:
             sess.query(UserModel).filter_by(id=int(target_id)).update({
@@ -96,16 +98,15 @@ class User:
     @staticmethod
     async def delete_by_id(target_id: int):
         """
-        Delete User object that have the specific id
-        @param taget_id: User id
+        Delete the User object by its id
+        @param target_id: Id of the User object to delete
+        @return: True if User object is deleted, False otherwise
         """
         try:
             with get_session() as sess:
-
                 try:
                     sess.query(UserModel).filter_by(
                         id=int(target_id)).delete()
-                    sess.commit()
                     sess.flush()
 
                 except Exception as e:
@@ -113,6 +114,18 @@ class User:
                     Debug.msg("UserController|delete_by_id",
                               "Failed to Delete {}".format(e),
                               DebugLevel.WARNING)
+                    return False
+
+                try:
+                    sess.commit()
+                except Exception as e:
+                    sess.rollback()
+                    Debug.msg("UserController|delete_by_id",
+                              "Failed to commit transaction: {}".format(e),
+                              DebugLevel.ERROR)
+                    return False
+
+            return True
 
         except Exception as e:
             Debug.msg("UserController|delete_by_id",
