@@ -13,7 +13,8 @@ module.exports = {
           DB_USER : "root",
           DB_PASS : "",
           DB_HOST : "127.0.0.1:3306",
-          DB_NAME : "budgetdiary"
+          DB_NAME : "budgetdiary",
+          SALT : "kotajenaka"
         }
       }
     ],
